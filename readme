@@ -12,3 +12,6 @@ essentials
 npm i mongoose -- Mongoose -- It provides a structured way to interact with MongoDB by allowing developers to define schemas
 
 npm install dotenv
+
+
+www.npmjs.com  -- for all NPM packages

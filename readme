@@ -1,0 +1,14 @@
+npm i nodemon -D  {restart server auto when anything changed/updated}
+
+now run using "npm run dev" 
+{
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+}
+
+npm install mongodb
+
+essentials
+npm i mongoose -- Mongoose -- It provides a structured way to interact with MongoDB by allowing developers to define schemas
+
+npm install dotenv

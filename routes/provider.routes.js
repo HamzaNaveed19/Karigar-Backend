@@ -19,4 +19,6 @@ router.put("/:id", updateProviderById);
 
 router.delete("/:id", deleteProviderById);
 
+router.post("/addReview", deleteProviderById);
+
 export default router;

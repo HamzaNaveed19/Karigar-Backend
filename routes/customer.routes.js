@@ -1,7 +1,11 @@
 import express from "express";
-import { addReview } from "../controller/customer.controller.js";
+import { addReview, addCustomer, getAllCustomers } from "../controller/customer.controller.js";
 
 const router = express.Router();
+
+router.post("/", addCustomer);
+
+router.get("/", getAllCustomers);
 
 router.post("/addReview", addReview);
 

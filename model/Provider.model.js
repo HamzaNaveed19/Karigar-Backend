@@ -6,6 +6,7 @@ const serviceProviderSchema = new mongoose.Schema(
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     phone: { type: String, required: true },
+
     verificationDocuments: {
       frontPic: { type: String, required: true }, // URLs of front image of ID
       backPic: { type: String, required: true }, // URLs of back image of ID
@@ -37,6 +38,7 @@ const serviceProviderSchema = new mongoose.Schema(
     totalReviews: { type: Number, default: 0 }, // Total number of reviews
     completedJobs: { type: Number, default: 0 }, // Total number of completed jobs
     reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: "Review" }],
+    
   },
   { timestamps: true }
 );

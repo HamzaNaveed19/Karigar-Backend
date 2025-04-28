@@ -14,7 +14,7 @@ const CustomerSchema = new mongoose.Schema(
     },
 
     profileImage: { type: String, required: false }, // Profile picture URL
-    reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: "Review" }], // Customer's reviews
+    // reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: "Review" }], // Customer's reviews
   },
   { timestamps: true }
 );

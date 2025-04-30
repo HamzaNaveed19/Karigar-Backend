@@ -15,6 +15,8 @@ const BookingSchema = new mongoose.Schema(
     },
     address: { type: String, required: true },
     price: { type: String, required: true },
+    bookingDate: { type: Date, required: true },
+    bookingTime: { type: String, required: true },
 
     
     status: {

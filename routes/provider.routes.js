@@ -19,4 +19,6 @@ router.put("/:id", updateProviderById);
 
 router.delete("/:id", deleteProviderById);
 
+// router.put("/", addServiceToProvider);
+
 export default router;

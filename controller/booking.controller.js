@@ -3,7 +3,7 @@ import Booking from "../model/Booking.model.js";
 
 export const addBooking = async (req, res) => {
   try {
-    const { bookingTitle, serviceProviderId, customerId, address, price } = req.body;
+    const { bookingTitle, serviceProviderId, customerId, address, price, bookingDate, bookingTime } = req.body;
 
     const newBooking = new Booking({
       bookingTitle,
@@ -11,6 +11,8 @@ export const addBooking = async (req, res) => {
       customer : customerId,
       address,
       price,
+      bookingDate,
+      bookingTime,
       status: "pending", // Default status
     });
 

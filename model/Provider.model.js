@@ -34,6 +34,7 @@ const serviceProviderSchema = new mongoose.Schema(
     experience: { type: Number, required: true }, // Years of experience
     languages: [{ type: String, required: true }], // Languages spoken
     education: { type: String, required: false },
+   
     rating: { type: Number, default: 0 }, // Average rating
     totalReviews: { type: Number, default: 0 }, // Total number of reviews
     completedJobs: { type: Number, default: 0 }, // Total number of completed jobs

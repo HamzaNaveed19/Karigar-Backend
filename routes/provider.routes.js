@@ -1,15 +1,19 @@
 import express from "express";
 import {
-  addProvider,
   getAllProviders,
   getProviderById,
   updateProviderById,
   deleteProviderById,
+  addProviderDetails,
+  getAllReviewsByID
 } from "../controller/provider.controller.js";
+import {  } from "../controller/review.controller.js";
 
 const router = express.Router();
 
-router.post("/", addProvider);
+router.get("/:id/getReviews", getAllReviewsByID);
+
+router.post("/:id", addProviderDetails);
 
 router.get("/", getAllProviders);
 

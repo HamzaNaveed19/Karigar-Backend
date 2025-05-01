@@ -20,8 +20,8 @@ export const calculateAverageRating = async (serviceProviderId) => {
       totalReviews: reviews.length,
     });
 
-    console.log(`✅ Average rating updated to ${averageRating.toFixed(2)} for service provider ${serviceProviderId}`);
+    console.log(`Average rating updated to ${averageRating.toFixed(2)} for service provider ${serviceProviderId}`);
   } catch (error) {
-    console.error("❌ Error calculating average rating:", error);
+    console.error("Error calculating average rating:", error);
   }
 };

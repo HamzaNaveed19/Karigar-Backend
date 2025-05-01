@@ -5,6 +5,11 @@ export const addBooking = async (req, res) => {
   try {
     const { bookingTitle, serviceProviderId, customerId, address, price, bookingDate, bookingTime } = req.body;
 
+    if (serviceProviderId == customerId) {
+      return res.status(400).json({ message: "Service provider and customer cannot be the same" });
+      // return res.status(404).json({ message: "Service provider not found" });
+    }
+
     const newBooking = new Booking({
       bookingTitle,
       serviceProvider : serviceProviderId,
@@ -62,3 +67,22 @@ export const getAllBookings = async (req, res) => {
       res.status(500).json({ error: "Failed to fetch bookings" });
     }
   };
+
+
+
+  
+  export const getBookingByProviderId = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const bookings = await Booking.find({ serviceProvider: id })
+        .populate("customer", "name phone") // populate specific fields
+        .populate("reviews", "rating comment"); // optional: populate reviews if you want full review details too
+  
+      res.status(200).json(bookings);
+    } catch (error) {
+      console.error("Error fetching bookings:", error);
+      res.status(500).json({ error: "Failed to fetch bookings" });
+    }
+  };
+

@@ -16,3 +16,6 @@ npm install dotenv
 
 npm install bcrypt
 -- for password entryption --
+
+npm install socket.io
+-- real time updation --

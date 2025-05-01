@@ -1,32 +1,30 @@
 import Customer from "../model/Customer.model.js";
 import ServiceProvider from "../model/Provider.model.js";
-import bcrypt from 'bcrypt';
+import User from "../model/User.model.js";
 
+// export const addCustomer = async (req, res) => {
+//   try {
+//     const hashedPassword = await bcrypt.hash(req.body.password, 10);
+//     const customerDetails = await Customer.create({
+//       ...req.body,
+//       password: hashedPassword
+//     });
+//     res.status(200).json(customerDetails);
+//   } catch (err) {
+//     console.error("Error:", err);
+//     res.status(500).json({ error: err.message });
+//   }
+// };
 
-
-export const addCustomer = async (req, res) => {
-  try {
-    const hashedPassword = await bcrypt.hash(req.body.password, 10);
-    const customerDetails = await Customer.create({
-      ...req.body,
-      password: hashedPassword
-    });
-    res.status(200).json(customerDetails);
-  } catch (err) {
-    console.error("Error:", err);
-    res.status(500).json({ error: err.message });
-  }
-};
-
-export const getAllCustomers = async (req, res) => {
-  try {
-    const customerDetails = await Customer.find({});
-    res.status(200).json(customerDetails);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Error fetching records");
-  }
-};
+// export const getAllCustomers = async (req, res) => {
+//   try {
+//     const customerDetails = await Customer.find({});
+//     res.status(200).json(customerDetails);
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).send("Error fetching records");
+//   }
+// };
 
 export const deleteCustomerById = async (req, res) => {
   try {
@@ -41,7 +39,6 @@ export const deleteCustomerById = async (req, res) => {
     res.status(500).send("Error deleting record");
   }
 };
-
 
 export const getFilteredProvidersBasedOnCustomerLocation = async (req, res) => {
   try {
@@ -60,13 +57,57 @@ export const getFilteredProvidersBasedOnCustomerLocation = async (req, res) => {
     }
 
     const providers = await ServiceProvider.find({
-      "location.address": { $regex: new RegExp(customerAddress, "i") }
+      "location.address": { $regex: new RegExp(customerAddress, "i") },
     });
 
     res.status(200).json(providers);
-
   } catch (error) {
     console.error("Error fetching filtered providers:", error);
     res.status(500).json({ message: "Server error" });
   }
-}
+};
+
+export const getAllCustomers = async (req, res) => {
+  try {
+    const customers = await Customer.find({ roleType: "Customer" });
+    res.status(200).json(customers);
+  } catch (err) {
+    console.error("Error fetching customers:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+
+
+export const addCustomerDetails = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const user = await User.findById(id);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const customer = await Customer.findById(id) || Customer.hydrate(user.toObject());
+
+    const { latitude, longitude, address, profileImage } = req.body;
+    customer.location = { latitude, longitude, address };
+    customer.profileImage = profileImage;
+
+    if (!customer.roles.includes("Customer")) {
+      customer.roles.push("Customer");
+    }
+
+
+    const savedCustomer = await customer.save();
+
+    res.status(200).json({
+      message: "Customer profile updated",
+      customer: savedCustomer,
+    });
+  } catch (err) {
+    console.error("Error updating customer:", err);
+    res.status(500).json({ error: err.message });
+  }
+};

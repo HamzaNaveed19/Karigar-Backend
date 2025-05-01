@@ -1,22 +1,16 @@
 import mongoose from "mongoose";
+import User from "./User.model.js";
 
 const CustomerSchema = new mongoose.Schema(
   {
-    name: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
-    password: { type: String, required: true }, // Securely hashed
-    phone: { type: String, required: true },
-    
-    location: {
-      latitude: { type: Number, required: false },
-      longitude: { type: Number, required: false },
-      address: { type: String, required: true }
-    },
-
-    profileImage: { type: String, required: false }, // Profile picture URL
+  location: {
+    latitude: { type: Number },
+    longitude: { type: Number },
+    address: { type: String, required: true },
   },
-  { timestamps: true }
+  profileImage: { type: String, required: false }
+  }
 );
 
-const Customer = mongoose.model("Customer", CustomerSchema);
+const Customer = User.discriminator("Customer", CustomerSchema);
 export default Customer;

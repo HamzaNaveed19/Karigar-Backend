@@ -19,3 +19,6 @@ npm install bcrypt
 
 npm install socket.io
 -- real time updation --
+
+npm install socket.io-client
+-- for client side --

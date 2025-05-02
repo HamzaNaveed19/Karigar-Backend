@@ -13,6 +13,8 @@ const CustomerSchema = new mongoose.Schema(
   notifications: [
     {
       description: { type: String },
+      type: { type: String },
+      read: { type: Boolean, default: false },
       date: { type: Date, default: Date.now },
     }
   ],

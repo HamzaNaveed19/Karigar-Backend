@@ -23,6 +23,13 @@ const ServiceProviderSchema = new mongoose.Schema({
       duration: { type: Number, required: true },
     },
   ],
+
+  workingHours: {
+    MF: { type: String, required: true},
+    Sat: { type: String, required: true },
+    Sun: { type: String, required: true },
+  },
+
   skills: [{ type: String, required: true }],
   experience: { type: Number, required: true },
   languages: [{ type: String, required: true }],
@@ -31,8 +38,10 @@ const ServiceProviderSchema = new mongoose.Schema({
   notifications: [
     {
       description: { type: String },
+      type: { type: String },
+      read: { type: Boolean, default: false },
       date: { type: Date, default: Date.now },
-    }
+    },
   ],
 
   rating: { type: Number, default: 0 },

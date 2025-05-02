@@ -143,6 +143,7 @@ export const addProviderDetails = async (req, res) => {
       location,
       profession,
       about,
+      workingHours,
       services,
       skills,
       experience,
@@ -156,6 +157,7 @@ export const addProviderDetails = async (req, res) => {
     provider.location = location;
     provider.profession = profession;
     provider.about = about;
+    provider.workingHours = workingHours;
     provider.services = services;
     provider.skills = skills;
     provider.experience = experience;
@@ -288,7 +290,7 @@ export const getProviderNotifications = async (req, res) => {
 };
 
 
-export const addProviderNotification = async (providerId, description) => {
+export const addProviderNotification = async (providerId, description, type) => {
   await ServiceProvider.findByIdAndUpdate(
     providerId,
     {
@@ -296,7 +298,8 @@ export const addProviderNotification = async (providerId, description) => {
       {
         notifications: 
         {
-          description
+          description,
+          type
         }
       }
     });

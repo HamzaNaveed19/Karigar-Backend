@@ -40,9 +40,10 @@ export const addBooking = async (req, res) => {
 
     const savedBooking = await newBooking.save();
 
-    await addProviderNotification(
+    await addCustomerNotification(
       serviceProviderId,
-      `New booking '${bookingTitle}' has been made.`
+      `New booking '${bookingTitle}' has been made.`,
+      "newBooking"
     );
 
     const providerId = serviceProviderId.toString();
@@ -143,21 +144,24 @@ export const updateBookingStatus = async (req, res) => {
 
       await addCustomerNotification(
         updatedBooking.customer._id,
-        `Your booking '${updatedBooking.bookingTitle}' has been completed. Thank you for choosing KARIGAR!`
+        `Your booking '${updatedBooking.bookingTitle}' has been completed. Thank you for choosing KARIGAR!`,
+        "completed"
       );
     }
 
     if(status === "cancelled") {
       await addCustomerNotification(
         updatedBooking.customer._id,
-        `Your booking '${updatedBooking.bookingTitle}' has been cancelled.`
+        `Your booking '${updatedBooking.bookingTitle}' has been cancelled.`,
+        "cancelled"
       );
     }
 
     if(status === "confirmed") {
       await addCustomerNotification(
         updatedBooking.customer._id,
-        `Your booking '${updatedBooking.bookingTitle}' has been confirmed.`
+        `Your booking '${updatedBooking.bookingTitle}' has been confirmed.`,
+        "confirmed"
       );
     }
 

@@ -133,11 +133,12 @@ export const getCustomerNotifications = async (req, res) => {
 
 
 
-export const addCustomerNotification = async (customerId, description) => {
+export const addCustomerNotification = async (customerId, description, type) => {
   await Customer.findByIdAndUpdate(customerId, {
     $push: {
       notifications: {
-        description
+        description,
+        type
       }
     }
   });

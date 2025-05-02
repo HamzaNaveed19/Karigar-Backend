@@ -111,3 +111,34 @@ export const addCustomerDetails = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+
+
+export const getCustomerNotifications = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const customer = await Customer.findById(id).select('notifications');
+
+    if (!customer) {
+      return res.status(404).json({ error: 'Customer not found' });
+    }
+
+    res.status(200).json({ notifications: customer.notifications });
+  } catch (error) {
+    console.error('Error fetching notifications:', error);
+    res.status(500).json({ error: 'Failed to fetch notifications' });
+  }
+};
+
+
+
+export const addCustomerNotification = async (customerId, description) => {
+  await Customer.findByIdAndUpdate(customerId, {
+    $push: {
+      notifications: {
+        description
+      }
+    }
+  });
+};

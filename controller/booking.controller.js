@@ -4,6 +4,8 @@ import { io, onlineUsers } from "../server.js";
 import { sendSMS } from "../middleWare/BookingHelper.js"; 
 import ServiceProvider from "../model/Provider.model.js";
 import mongoose from "mongoose";
+import { addCustomerNotification } from "./customer.controller.js";
+import { addProviderNotification } from "./provider.controller.js";
 
 
 export const addBooking = async (req, res) => {
@@ -37,6 +39,19 @@ export const addBooking = async (req, res) => {
     });
 
     const savedBooking = await newBooking.save();
+
+    await addProviderNotification(
+      serviceProviderId,
+      `New booking '${bookingTitle}' has been made.`
+    );
+
+    const providerId = serviceProviderId.toString();
+    const socketId = onlineUsers.get(providerId);
+
+    if (socketId) {
+      io.to(socketId).emit("newBooking", savedBooking );
+    }
+
 
     res.status(201).json({
       message: "Booking created successfully",
@@ -111,10 +126,6 @@ export const updateBookingStatus = async (req, res) => {
     const customerId = updatedBooking.customer._id.toString();
     const socketId = onlineUsers.get(customerId);
 
-    // Real-time update
-    if (socketId) {
-      io.to(socketId).emit("bookingStatusUpdated", updatedBooking);
-    }
 
     // SMS notification
     const phone = updatedBooking.customer.phone;
@@ -129,11 +140,43 @@ export const updateBookingStatus = async (req, res) => {
         updatedBooking.serviceProvider,
         { $inc: { completedJobs: 1 } }
       );
+
+      await addCustomerNotification(
+        updatedBooking.customer._id,
+        `Your booking '${updatedBooking.bookingTitle}' has been completed. Thank you for choosing KARIGAR!`
+      );
     }
 
+    if(status === "cancelled") {
+      await addCustomerNotification(
+        updatedBooking.customer._id,
+        `Your booking '${updatedBooking.bookingTitle}' has been cancelled.`
+      );
+    }
+
+    if(status === "confirmed") {
+      await addCustomerNotification(
+        updatedBooking.customer._id,
+        `Your booking '${updatedBooking.bookingTitle}' has been confirmed.`
+      );
+    }
+
+
     // if (message) {
-    //   await sendSMS({ num: phone, msg: message });
+    //   try {
+    //     await sendSMS({ num: phone, msg: message });
+    //   } catch (smsError) {
+    //     console.warn("SMS failed to send:", smsError.message);
+    //   }
     // }
+
+
+    // Real-time update
+    if (socketId) {
+      io.to(socketId).emit("bookingStatusUpdated", updatedBooking);
+    }
+
+
 
     res.status(200).json(updatedBooking);
   } catch (error) {
@@ -141,7 +184,6 @@ export const updateBookingStatus = async (req, res) => {
     res.status(500).json({ error: "Failed to update booking status" });
   }
 };
-
 
 
 export const getMonthlyCompletedBookings = async (req, res) => {

@@ -28,7 +28,13 @@ const ServiceProviderSchema = new mongoose.Schema({
   languages: [{ type: String, required: true }],
   education: { type: String },
 
-  
+  notifications: [
+    {
+      description: { type: String },
+      date: { type: Date, default: Date.now },
+    }
+  ],
+
   rating: { type: Number, default: 0 },
   totalReviews: { type: Number, default: 0 },
   completedJobs: { type: Number, default: 0 },

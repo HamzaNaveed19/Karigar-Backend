@@ -1,3 +1,4 @@
+import e from "express";
 import ServiceProvider from "../model/Provider.model.js";
 import User from "../model/User.model.js";
 
@@ -264,4 +265,39 @@ export const deleteService = async (req, res) => {
     console.error("Error deleting service:", error);
     res.status(500).json({ error: "Internal server error" });
   }
+};
+
+
+
+
+export const getProviderNotifications = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const provider = await ServiceProvider.findById(id).select('notifications');
+
+    if (!provider) {
+      return res.status(404).json({ error: 'Provider not found' });
+    }
+
+    res.status(200).json({ notifications: provider.notifications });
+  } catch (error) {
+    console.error('Error fetching notifications:', error);
+    res.status(500).json({ error: 'Failed to fetch notifications' });
+  }
+};
+
+
+export const addProviderNotification = async (providerId, description) => {
+  await ServiceProvider.findByIdAndUpdate(
+    providerId,
+    {
+      $push: 
+      {
+        notifications: 
+        {
+          description
+        }
+      }
+    });
 };

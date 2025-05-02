@@ -7,13 +7,15 @@ import {
   addProviderDetails,
   getAllReviewsByID,
   addMoreServices,
-  deleteService
+  deleteService,
+  getCustomerNotifications,
+  getProviderNotifications
 } from "../controller/provider.controller.js";
 import {  } from "../controller/review.controller.js";
 
 const router = express.Router();
 
-router.get("/:id/getReviews", getAllReviewsByID);
+router.get("/reviews/:id", getAllReviewsByID);
 
 router.post("/:id", addProviderDetails);
 
@@ -28,5 +30,7 @@ router.delete("/:id", deleteProviderById);
 router.post("/addServices/:id", addMoreServices);
 
 router.delete("/deleteService/:id", deleteService);
+
+router.get("/notifications/:id", getProviderNotifications);
 
 export default router;

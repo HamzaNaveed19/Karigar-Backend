@@ -8,7 +8,14 @@ const CustomerSchema = new mongoose.Schema(
     longitude: { type: Number },
     address: { type: String, required: true },
   },
-  profileImage: { type: String, required: false }
+  profileImage: { type: String, required: false },
+
+  notifications: [
+    {
+      description: { type: String },
+      date: { type: Date, default: Date.now },
+    }
+  ],
   }
 );
 

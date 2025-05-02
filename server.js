@@ -32,11 +32,11 @@ const io = new Server(server, {
 
 const onlineUsers = new Map();
 io.on("connection", (socket) => {
-  console.log("Socket connected:", socket.id);
+  // console.log("Socket connected:", socket.id);
 
   socket.on("register", (userId) => {
     onlineUsers.set(userId, socket.id);
-    console.log(`User ${userId} registered with socket ${socket.id}`);
+    // console.log(`User ${userId} registered with socket ${socket.id}`);
   });
 
   socket.on("disconnect", () => {

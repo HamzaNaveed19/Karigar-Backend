@@ -123,8 +123,6 @@ export const deleteProviderById = async (req, res) => {
   }
 };
 
-
-
 export const addProviderDetails = async (req, res) => {
   const { id } = req.params;
 
@@ -183,11 +181,6 @@ export const addProviderDetails = async (req, res) => {
 };
 
 
-
-
-
-
-
 export const getAllReviewsByID = async (req, res) => {
   const { id } = req.params;
 
@@ -200,5 +193,75 @@ export const getAllReviewsByID = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).send("Error fetching reviews");
+  }
+};
+
+
+
+export const addMoreServices = async (req, res) => {
+  try {
+    const { providerId } = req.params;
+    const { services } = req.body;
+
+    if (!Array.isArray(services) || services.length === 0) {
+      return res.status(400).json({ error: "Services must be a non-empty array" });
+    }
+
+    // Validate each service object
+    const isValid = services.every(service =>
+      service.name && service.price && service.duration
+    );
+
+    if (!isValid) {
+      return res.status(400).json({ error: "Each service must have name, price, and duration" });
+    }
+
+    const updatedProvider = await ServiceProvider.findByIdAndUpdate(
+      providerId,
+      { $push: { services: { $each: services } } },
+      { new: true }
+    );
+
+    if (!updatedProvider) {
+      return res.status(404).json({ error: "Service provider not found" });
+    }
+
+    res.status(200).json({
+      message: "Services added successfully",
+      services: updatedProvider.services,
+    });
+  } catch (error) {
+    console.error("Error adding services:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+
+export const deleteService = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { serviceName } = req.body;
+
+    if (!serviceName) {
+      return res.status(400).json({ error: "Service name is required" });
+    }
+
+    const updatedProvider = await ServiceProvider.findByIdAndUpdate(
+      id,
+      { $pull: { services: { name: serviceName } } },
+      { new: true }
+    );
+
+    if (!updatedProvider) {
+      return res.status(404).json({ error: "Service provider not found" });
+    }
+
+    res.status(200).json({
+      message: `Service "${serviceName}" deleted successfully`,
+      services: updatedProvider.services,
+    });
+  } catch (error) {
+    console.error("Error deleting service:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 };

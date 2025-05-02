@@ -5,7 +5,9 @@ import {
   updateProviderById,
   deleteProviderById,
   addProviderDetails,
-  getAllReviewsByID
+  getAllReviewsByID,
+  addMoreServices,
+  deleteService
 } from "../controller/provider.controller.js";
 import {  } from "../controller/review.controller.js";
 
@@ -23,6 +25,8 @@ router.put("/:id", updateProviderById);
 
 router.delete("/:id", deleteProviderById);
 
-// router.put("/", addServiceToProvider);
+router.post("/addServices/:id", addMoreServices);
+
+router.delete("/deleteService/:id", deleteService);
 
 export default router;

@@ -1,5 +1,9 @@
 import Booking from "../model/Booking.model.js";
-import { io, onlineUsers } from "../server.js"; // adjust path if needed
+import { io, onlineUsers } from "../server.js";
+
+import { sendSMS } from "../middleWare/BookingHelper.js"; 
+
+
 
 export const addBooking = async (req, res) => {
   try {
@@ -88,18 +92,18 @@ export const getBookingByProviderId = async (req, res) => {
 };
 
 
+
+
 export const updateBookingStatus = async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
 
-    console.log("Booking ID received:", id);
-
     const updatedBooking = await Booking.findByIdAndUpdate(
       id,
       { status },
       { new: true }
-    ).populate("customer", "_id name");
+    ).populate("customer", "_id name phone");
 
     if (!updatedBooking) {
       return res.status(404).json({ error: "Booking not found" });
@@ -108,8 +112,22 @@ export const updateBookingStatus = async (req, res) => {
     const customerId = updatedBooking.customer._id.toString();
     const socketId = onlineUsers.get(customerId);
 
+    // Real-time update
     if (socketId) {
       io.to(socketId).emit("bookingStatusUpdated", updatedBooking);
+    }
+
+    // SMS notification
+    const phone = updatedBooking.customer.phone;
+    const message =
+      status === "confirmed"
+        ? `Dear ${updatedBooking.customer.name}, your booking '${updatedBooking.bookingTitle}' has been confirmed.`
+        : status === "cancelled"
+        ? `Dear ${updatedBooking.customer.name}, your booking '${updatedBooking.bookingTitle}' has been cancelled.`
+        : null;
+
+    if (message) {
+      await sendSMS({ num: phone, msg: message });
     }
 
     res.status(200).json(updatedBooking);
@@ -118,3 +136,4 @@ export const updateBookingStatus = async (req, res) => {
     res.status(500).json({ error: "Failed to update booking status" });
   }
 };
+

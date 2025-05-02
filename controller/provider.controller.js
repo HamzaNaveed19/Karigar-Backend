@@ -200,7 +200,7 @@ export const getAllReviewsByID = async (req, res) => {
 
 export const addMoreServices = async (req, res) => {
   try {
-    const { providerId } = req.params;
+    const { id } = req.params;
     const { services } = req.body;
 
     if (!Array.isArray(services) || services.length === 0) {
@@ -217,7 +217,7 @@ export const addMoreServices = async (req, res) => {
     }
 
     const updatedProvider = await ServiceProvider.findByIdAndUpdate(
-      providerId,
+      id,
       { $push: { services: { $each: services } } },
       { new: true }
     );

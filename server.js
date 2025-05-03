@@ -2,8 +2,7 @@ import express from "express"; // express to create the server.
 import dotenv from "dotenv"; // dotenv to manage environment variables
 import http from "http"; // Required for socket server
 import { Server } from "socket.io"; // Socket.IO server
-
-
+import cors from "cors"; // Importing CORS middleware
 
 
 import userRoutes from "./routes/user.routes.js"; // Importing the user routes
@@ -12,7 +11,7 @@ import customerRoutes from './routes/customer.routes.js'; // Importing the custo
 import bookingRoutes from './routes/booking.routes.js'; // Importing the booking routes
 import categoryRoutes from './routes/category.routes.js'; // Importing the category routes
 import connectDB from "./db/connection.js"; // Importing the database connection
-import cors from "cors"; // Importing CORS middleware
+
 
 dotenv.config(); // Load environment variables
 
@@ -21,11 +20,10 @@ const PORT = process.env.PORT;
 
 
 // NEW CODE
-// Create HTTP server and Socket.IO instance
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "*", // Update to frontend URL in production
+    origin: "*",
     methods: ["GET", "POST"],
   },
 });
@@ -51,7 +49,7 @@ io.on("connection", (socket) => {
 });
 
 // OLD CODE
-connectDB(); // Connect to the database
+connectDB(); // Connection
 
 app.use(express.json());
 app.use(cors());
@@ -66,10 +64,8 @@ app.use("/category", categoryRoutes);
 // });
 
 // New CODE
-// Start server
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 
-// Export for controllers
 export { io, onlineUsers };

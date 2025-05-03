@@ -15,7 +15,7 @@ import {  } from "../controller/review.controller.js";
 
 const router = express.Router();
 
-router.get("/reviews/:id", getAllReviewsByID);
+
 
 router.post("/:id", addProviderDetails);
 
@@ -33,4 +33,5 @@ router.delete("/deleteService/:id", deleteService);
 
 router.get("/notifications/:id", getProviderNotifications);
 
+router.get("/reviews/:id", getAllReviewsByID);
 export default router;

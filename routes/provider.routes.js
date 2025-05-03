@@ -8,7 +8,6 @@ import {
   getAllReviewsByID,
   addMoreServices,
   deleteService,
-  getCustomerNotifications,
   getProviderNotifications
 } from "../controller/provider.controller.js";
 import {  } from "../controller/review.controller.js";

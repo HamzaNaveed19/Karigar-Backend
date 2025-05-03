@@ -1,4 +1,3 @@
-import e from "express";
 import ServiceProvider from "../model/Provider.model.js";
 import User from "../model/User.model.js";
 

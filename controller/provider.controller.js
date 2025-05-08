@@ -1,5 +1,6 @@
 import ServiceProvider from "../model/Provider.model.js";
 import User from "../model/User.model.js";
+import mongoose from "mongoose";
 
 // export const addProvider = async (req, res) => {
 //   try {
@@ -11,15 +12,54 @@ import User from "../model/User.model.js";
 //   }
 // };
 
+// export const getAllProviders = async (req, res) => {
+//   try {
+//     const providerDetails = await ServiceProvider.find({})
+//       .select('name personalImage profession rating totalReviews location experience completedJobs skillCount');
+
+
+//     res.status(200).json(providerDetails);
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).send("Error fetching records");
+//   }
+// };
+
 export const getAllProviders = async (req, res) => {
   try {
-    const providerDetails = await ServiceProvider.find({});
+    const providerDetails = await ServiceProvider.aggregate([
+      {
+        $addFields: {
+          serviceStartingFrom: {
+            $min: "$services.price"
+          }
+        }
+      },
+      {
+        $project: {
+          name: 1,
+          personalImage: 1,
+          profession: 1,
+          rating: 1,
+          totalReviews: 1,
+          location: 1,
+          experience: 1,
+          completedJobs: 1,
+          skillCount: 1,
+          serviceStartingFrom: 1,
+        }
+      }
+    ]);
+
     res.status(200).json(providerDetails);
   } catch (err) {
     console.error(err);
     res.status(500).send("Error fetching records");
   }
 };
+
+
+
 
 
 export const getProviderById = async (req, res) => {

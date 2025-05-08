@@ -5,7 +5,7 @@ import { sendSMS } from "../middleWare/BookingHelper.js";
 import ServiceProvider from "../model/Provider.model.js";
 import mongoose from "mongoose";
 import { addCustomerNotification } from "./customer.controller.js";
-import { addProviderNotification } from "./provider.controller.js";
+// import { addProviderNotification } from "./provider.controller.js";
 
 
 export const addBooking = async (req, res) => {
@@ -53,11 +53,15 @@ export const addBooking = async (req, res) => {
       io.to(socketId).emit("newBooking", savedBooking );
     }
 
+    const populatedBooking = await Booking.findById(savedBooking._id)
+      .select('-__v -updatedAt -customer -reviews')
+      .populate("serviceProvider", "name profession personalImage rating -roleType");
 
     res.status(201).json({
       message: "Booking created successfully",
-      booking: savedBooking,
+      booking: populatedBooking,
     });
+
   } catch (error) {
     console.error("Error adding booking:", error);
     res.status(500).json({ error: "Failed to create booking" });

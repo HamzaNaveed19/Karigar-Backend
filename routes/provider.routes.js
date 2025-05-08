@@ -33,4 +33,5 @@ router.delete("/deleteService/:id", deleteService);
 router.get("/notifications/:id", getProviderNotifications);
 
 router.get("/reviews/:id", getAllReviewsByID);
+
 export default router;

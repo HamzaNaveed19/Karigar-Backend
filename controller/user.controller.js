@@ -1,3 +1,4 @@
+import ServiceProvider from "../model/Provider.model.js";
 import User from "../model/User.model.js";
 import bcrypt from "bcrypt";
 
@@ -67,6 +68,32 @@ export const loginUser = async (req, res) => {
 
     res.status(200).json({ message: "Login successful", userId: user._id });
   } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
+
+
+
+export const updatePassword = async (req, res) => {
+  const { id } = req.params;
+  const { currentPassword, newPassword } = req.body;
+
+  try {
+    const user = await User.findById(id);
+    if (!user) return res.status(404).json({ message: "User not found"});
+
+
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) return res.status(400).json({ message: "Incorrect current password" });
+
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedNewPassword;
+
+    await user.save();
+
+    res.status(200).json({ message: "Password updated successfully" });
+  } catch (err) {
+    console.error("Password update error:", err);
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };

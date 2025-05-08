@@ -21,19 +21,33 @@ export const getAllProviders = async (req, res) => {
   }
 };
 
+
 export const getProviderById = async (req, res) => {
   try {
     const { id } = req.params;
-    const providerDetails = await ServiceProvider.findById(id);
+    
+    const providerDetails = await ServiceProvider.findById(id)
+      .select('-verificationDocuments -password -roles -roleType -notifications -updatedAt -__v')
+      .populate({
+        path: 'reviews',
+        select: 'rating comment customer',
+        populate: {
+          path: 'customer',
+          select: 'name profileImage -roleType',
+        }
+      });
+
     if (!providerDetails) {
       return res.status(404).send("Provider not found");
     }
+
     res.status(200).json(providerDetails);
   } catch (err) {
     console.error(err);
     res.status(500).send("Error fetching record");
   }
 };
+
 
 // export const updateProviderById = async (req, res) => {
 //   try {
@@ -50,6 +64,65 @@ export const getProviderById = async (req, res) => {
 // };
 
 
+// export const updateProviderById = async (req, res) => {
+//   const { id } = req.params;
+
+//   try {
+//     // Step 1: Check if the user exists
+//     const user = await User.findById(id);
+//     if (!user) {
+//       return res.status(404).json({ message: "User not found" });
+//     }
+
+//     // Step 2: Find the ServiceProvider or hydrate a new one
+//     let provider = await ServiceProvider.findById(id) || ServiceProvider.hydrate(user.toObject());
+
+//     // Step 3: Update provider-specific fields only if provided in the request body
+//     const {
+//       verificationDocuments,
+//       personalImage,
+//       location,
+//       profession,
+//       about,
+//       services,
+//       skills,
+//       experience,
+//       languages,
+//       education
+//     } = req.body;
+
+//     // Only update the fields that are present in the request body
+//     if (verificationDocuments) provider.verificationDocuments = verificationDocuments;
+//     if (personalImage) provider.personalImage = personalImage;
+//     if (location) provider.location = location;
+//     if (profession) provider.profession = profession;
+//     if (about) provider.about = about;
+//     if (services) provider.services = services;
+//     if (skills) provider.skills = skills;
+//     if (experience) provider.experience = experience;
+//     if (languages) provider.languages = languages;
+//     if (education) provider.education = education;
+
+//     // Ensure 'ServiceProvider' role is added if not already present
+//     // if (!provider.roles.includes("ServiceProvider")) {
+//     //   provider.roles.push("ServiceProvider");
+//     // }
+
+//     // provider.roleType = "ServiceProvider";
+
+//     // Step 4: Save the updated provider data
+//     const updatedProvider = await provider.save();
+
+//     res.status(200).json({
+//       message: "Provider profile updated successfully",
+//       provider: updatedProvider,
+//     });
+//   } catch (err) {
+//     console.error("Error updating provider:", err);
+//     res.status(500).json({ error: err.message });
+//   }
+// };
+
 export const updateProviderById = async (req, res) => {
   const { id } = req.params;
 
@@ -60,10 +133,13 @@ export const updateProviderById = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Step 2: Find the ServiceProvider or hydrate a new one
-    let provider = await ServiceProvider.findById(id) || ServiceProvider.hydrate(user.toObject());
+    // Step 2: Find ServiceProvider instance or hydrate from base User
+    let provider = await ServiceProvider.findById(id);
+    if (!provider) {
+      provider = ServiceProvider.hydrate(user.toObject());
+    }
 
-    // Step 3: Update provider-specific fields only if provided in the request body
+    // Step 3: Destructure request body
     const {
       verificationDocuments,
       personalImage,
@@ -74,10 +150,11 @@ export const updateProviderById = async (req, res) => {
       skills,
       experience,
       languages,
-      education
+      education,
+      workingHours,
     } = req.body;
 
-    // Only update the fields that are present in the request body
+    // Step 4: Conditionally update fields
     if (verificationDocuments) provider.verificationDocuments = verificationDocuments;
     if (personalImage) provider.personalImage = personalImage;
     if (location) provider.location = location;
@@ -88,15 +165,9 @@ export const updateProviderById = async (req, res) => {
     if (experience) provider.experience = experience;
     if (languages) provider.languages = languages;
     if (education) provider.education = education;
+    if (workingHours) provider.workingHours = workingHours;
 
-    // Ensure 'ServiceProvider' role is added if not already present
-    // if (!provider.roles.includes("ServiceProvider")) {
-    //   provider.roles.push("ServiceProvider");
-    // }
-
-    // provider.roleType = "ServiceProvider";
-
-    // Step 4: Save the updated provider data
+    // Step 5: Save updated provider (this triggers skillCount update via pre("save") middleware)
     const updatedProvider = await provider.save();
 
     res.status(200).json({
@@ -108,6 +179,8 @@ export const updateProviderById = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+
 
 export const deleteProviderById = async (req, res) => {
   try {
@@ -187,7 +260,7 @@ export const getAllReviewsByID = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const provider = await ServiceProvider.findById(id).populate("reviews");
+    const provider = await ServiceProvider.findById(id).populate("reviews", "rating comment");
     if (!provider) {
       return res.status(404).json({ message: "Provider not found" });
     }

@@ -44,11 +44,29 @@ const ServiceProviderSchema = new mongoose.Schema({
     },
   ],
 
+  skillCount: { type: Number, default: 0 },
   rating: { type: Number, default: 0 },
   totalReviews: { type: Number, default: 0 },
   completedJobs: { type: Number, default: 0 },
   reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: "Review" }],
 });
+
+
+ServiceProviderSchema.pre("save", function (next) {
+  if (Array.isArray(this.skills)) {
+    this.skillCount = this.skills.length;
+  }
+  next();
+});
+
+ServiceProviderSchema.pre("findOneAndUpdate", function (next) {
+  const update = this.getUpdate();
+  if (update.skills) {
+    update.skillCount = update.skills.length;
+  }
+  next();
+});
+
 
 const ServiceProvider = User.discriminator(
   "ServiceProvider",

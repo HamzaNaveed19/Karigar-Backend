@@ -1,6 +1,13 @@
 import ServiceProvider from "../model/Provider.model.js";
 import User from "../model/User.model.js";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+dotenv.config();
+
+
+const JWT_SECRET = process.env.JWT_SECRET;
+
 
 export const registerUser = async (req, res) => {
   const { name, email, password, phone } = req.body;
@@ -66,7 +73,16 @@ export const loginUser = async (req, res) => {
     if (!isPasswordValid)
       return res.status(400).json({ message: "Invalid credentials" });
 
-    res.status(200).json({ message: "Login successful", userId: user._id });
+
+    const token = jwt.sign({ userId: user._id, roles: user.roles }, JWT_SECRET, {
+      expiresIn: process.env.JWT_EXPIRATION,
+    });
+
+    res.status(200).json({
+      message: 'Login successful',
+      token,
+      userId: user._id,
+    });
   } catch (err) {
     res.status(500).json({ message: "Server error", error: err.message });
   }

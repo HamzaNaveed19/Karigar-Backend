@@ -78,7 +78,6 @@ export const getAllCustomers = async (req, res) => {
 };
 
 
-
 export const addCustomerDetails = async (req, res) => {
   const { id } = req.params;
 
@@ -113,7 +112,6 @@ export const addCustomerDetails = async (req, res) => {
 };
 
 
-
 export const getCustomerNotifications = async (req, res) => {
   const { id } = req.params;
 
@@ -130,7 +128,6 @@ export const getCustomerNotifications = async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch notifications' });
   }
 };
-
 
 
 export const addCustomerNotification = async (customerId, description, type) => {

@@ -2,28 +2,6 @@ import ServiceProvider from "../model/Provider.model.js";
 import User from "../model/User.model.js";
 import mongoose from "mongoose";
 
-// export const addProvider = async (req, res) => {
-//   try {
-//     const providerDetails = await ServiceProvider.create(req.body);
-//     res.status(200).json(providerDetails);
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).send("Error adding record");
-//   }
-// };
-
-// export const getAllProviders = async (req, res) => {
-//   try {
-//     const providerDetails = await ServiceProvider.find({})
-//       .select('name personalImage profession rating totalReviews location experience completedJobs skillCount');
-
-
-//     res.status(200).json(providerDetails);
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).send("Error fetching records");
-//   }
-// };
 
 export const getAllProviders = async (req, res) => {
   try {
@@ -59,9 +37,6 @@ export const getAllProviders = async (req, res) => {
 };
 
 
-
-
-
 export const getProviderById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -70,7 +45,7 @@ export const getProviderById = async (req, res) => {
       .select('-verificationDocuments -password -roles -roleType -notifications -updatedAt -__v')
       .populate({
         path: 'reviews',
-        select: 'rating comment customer',
+        select: 'rating comment customer createdAt',
         populate: {
           path: 'customer',
           select: 'name profileImage -roleType',
@@ -88,80 +63,6 @@ export const getProviderById = async (req, res) => {
   }
 };
 
-
-// export const updateProviderById = async (req, res) => {
-//   try {
-//     const { id } = req.params;
-//     const provider = await ServiceProvider.findByIdAndUpdate(id, req.body, { new: true });
-//     if (!provider) {
-//       return res.status(404).send("Provider not found");
-//     }
-//     res.status(200).json(provider);
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).send("Error updating record");
-//   }
-// };
-
-
-// export const updateProviderById = async (req, res) => {
-//   const { id } = req.params;
-
-//   try {
-//     // Step 1: Check if the user exists
-//     const user = await User.findById(id);
-//     if (!user) {
-//       return res.status(404).json({ message: "User not found" });
-//     }
-
-//     // Step 2: Find the ServiceProvider or hydrate a new one
-//     let provider = await ServiceProvider.findById(id) || ServiceProvider.hydrate(user.toObject());
-
-//     // Step 3: Update provider-specific fields only if provided in the request body
-//     const {
-//       verificationDocuments,
-//       personalImage,
-//       location,
-//       profession,
-//       about,
-//       services,
-//       skills,
-//       experience,
-//       languages,
-//       education
-//     } = req.body;
-
-//     // Only update the fields that are present in the request body
-//     if (verificationDocuments) provider.verificationDocuments = verificationDocuments;
-//     if (personalImage) provider.personalImage = personalImage;
-//     if (location) provider.location = location;
-//     if (profession) provider.profession = profession;
-//     if (about) provider.about = about;
-//     if (services) provider.services = services;
-//     if (skills) provider.skills = skills;
-//     if (experience) provider.experience = experience;
-//     if (languages) provider.languages = languages;
-//     if (education) provider.education = education;
-
-//     // Ensure 'ServiceProvider' role is added if not already present
-//     // if (!provider.roles.includes("ServiceProvider")) {
-//     //   provider.roles.push("ServiceProvider");
-//     // }
-
-//     // provider.roleType = "ServiceProvider";
-
-//     // Step 4: Save the updated provider data
-//     const updatedProvider = await provider.save();
-
-//     res.status(200).json({
-//       message: "Provider profile updated successfully",
-//       provider: updatedProvider,
-//     });
-//   } catch (err) {
-//     console.error("Error updating provider:", err);
-//     res.status(500).json({ error: err.message });
-//   }
-// };
 
 export const updateProviderById = async (req, res) => {
   const { id } = req.params;
@@ -219,7 +120,6 @@ export const updateProviderById = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
-
 
 
 export const deleteProviderById = async (req, res) => {
@@ -312,7 +212,6 @@ export const getAllReviewsByID = async (req, res) => {
 };
 
 
-
 export const addMoreServices = async (req, res) => {
   try {
     const { id } = req.params;
@@ -380,8 +279,6 @@ export const deleteService = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
-
-
 
 
 export const getProviderNotifications = async (req, res) => {

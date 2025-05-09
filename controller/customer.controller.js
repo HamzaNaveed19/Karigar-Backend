@@ -67,6 +67,41 @@ export const getFilteredProvidersBasedOnCustomerLocation = async (req, res) => {
   }
 };
 
+
+export const getCustomerByID = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const customer = await Customer.findById(id).select('-password -roles -roleType -__v -updatedAt');
+    if (!customer) {
+      return res.status(404).json({ message: "Customer not found" });
+    }
+    res.status(200).json(customer);
+  } catch (err) {
+    console.error("Error fetching customer:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+export const updateCustomerById = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const customer = await Customer.findByIdAndUpdate(id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+    if (!customer) {
+      return res.status(404).json({ message: "Customer not found" });
+    }
+    res.status(200).json(customer);
+  } catch (err) {
+    console.error("Error updating customer:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+
 export const getAllCustomers = async (req, res) => {
   try {
     const customers = await Customer.find({ roleType: "Customer" });

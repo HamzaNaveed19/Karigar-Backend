@@ -1,6 +1,5 @@
 import ServiceProvider from "../model/Provider.model.js";
 import User from "../model/User.model.js";
-import mongoose from "mongoose";
 
 
 export const getAllProviders = async (req, res) => {
@@ -195,21 +194,6 @@ export const addProviderDetails = async (req, res) => {
   }
 };
 
-
-export const getAllReviewsByID = async (req, res) => {
-  const { id } = req.params;
-
-  try {
-    const provider = await ServiceProvider.findById(id).populate("reviews", "rating comment");
-    if (!provider) {
-      return res.status(404).json({ message: "Provider not found" });
-    }
-    res.status(200).json(provider.reviews);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Error fetching reviews");
-  }
-};
 
 
 export const addMoreServices = async (req, res) => {

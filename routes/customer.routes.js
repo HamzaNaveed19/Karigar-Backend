@@ -1,20 +1,31 @@
 import express from "express";
-import { deleteCustomerById, getAllCustomers, getFilteredProvidersBasedOnCustomerLocation, addCustomerDetails, getCustomerNotifications } from "../controller/customer.controller.js";
+import {
+  deleteCustomerById,
+  getCustomerByID,
+  getFilteredProvidersBasedOnCustomerLocation,
+  addCustomerDetails,
+  getCustomerNotifications,
+  updateCustomerById,
+} from "../controller/customer.controller.js";
 import { addReview } from "../controller/review.controller.js";
 import { authenticateToken } from "../middleWare/Authentication.js";
 
 const router = express.Router();
 
-router.post("/addReview", addReview);
 
-router.post("/:id", addCustomerDetails);
+router.get("/:id", authenticateToken, getCustomerByID);
 
-router.get("/", authenticateToken ,getAllCustomers);
+router.get("/providers/:id", getFilteredProvidersBasedOnCustomerLocation);
+
+router.get("/notifications/:id", authenticateToken, getCustomerNotifications);
+
+router.post("/addReview", authenticateToken, addReview);
+
+router.post("/:id", authenticateToken, addCustomerDetails);
+
+router.put("/:id", authenticateToken, updateCustomerById);
 
 router.delete("/:id", deleteCustomerById);
 
-router.get("/:id", getFilteredProvidersBasedOnCustomerLocation);
-
-router.get("/notifications/:id", getCustomerNotifications);
 
 export default router;

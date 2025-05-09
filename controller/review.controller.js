@@ -43,7 +43,7 @@ export const getAllReviewsByID = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const provider = await ServiceProvider.findById(id).populate("reviews");
+    const provider = await ServiceProvider.findById(id).populate("reviews", "rating comment");
     if (!provider) {
       return res.status(404).json({ message: "Provider not found" });
     }

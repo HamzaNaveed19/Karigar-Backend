@@ -23,6 +23,7 @@ const ServiceProviderSchema = new mongoose.Schema({
       duration: { type: Number, required: true },
     },
   ],
+  smsNotification : {type: Boolean, default: true},
 
   workingHours: {
     MF: { type: String, required: true},
@@ -33,7 +34,7 @@ const ServiceProviderSchema = new mongoose.Schema({
   skills: [{ type: String, required: true }],
   experience: { type: Number, required: true },
   languages: [{ type: String, required: true }],
-  education: { type: String },
+  education: [{ type: String }],
 
   notifications: [
     {

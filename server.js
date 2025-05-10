@@ -1,9 +1,8 @@
-import express from "express"; // express to create the server.
-import dotenv from "dotenv"; // dotenv to manage environment variables
-import http from "http"; // Required for socket server
-import { Server } from "socket.io"; // Socket.IO server
-import cors from "cors"; // Importing CORS middleware
-
+import express from "express";
+import dotenv from "dotenv";
+import http from "http";
+import { Server } from "socket.io";
+import cors from "cors";
 
 import userRoutes from "./routes/user.routes.js"; 
 import providerRoutes from './routes/provider.routes.js'; 
@@ -13,11 +12,15 @@ import categoryRoutes from './routes/category.routes.js';
 import connectDB from "./db/connection.js";
 
 
-dotenv.config(); // Load environment variables
+dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT;
 
+connectDB(); // Connection
+
+app.use(express.json());
+app.use(cors());
 
 // NEW CODE
 const server = http.createServer(app);
@@ -48,24 +51,16 @@ io.on("connection", (socket) => {
   });
 });
 
-// OLD CODE
-connectDB(); // Connection
 
-app.use(express.json());
-app.use(cors());
 app.use("/user", userRoutes);
 app.use("/provider", providerRoutes);
 app.use("/customer", customerRoutes);
 app.use("/booking", bookingRoutes);
 app.use("/category", categoryRoutes);
 
-// app.listen(PORT, () => {
-//   console.log(`Server running on port ${PORT}`);
-// });
-
-// New CODE
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
 
 export { io, onlineUsers };

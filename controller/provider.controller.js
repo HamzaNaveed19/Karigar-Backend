@@ -67,19 +67,16 @@ export const updateProviderById = async (req, res) => {
   const { id } = req.params;
 
   try {
-    // Step 1: Check if the user exists
     const user = await User.findById(id);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Step 2: Find ServiceProvider instance or hydrate from base User
     let provider = await ServiceProvider.findById(id);
     if (!provider) {
       provider = ServiceProvider.hydrate(user.toObject());
     }
 
-    // Step 3: Destructure request body
     const {
       verificationDocuments,
       personalImage,
@@ -94,7 +91,7 @@ export const updateProviderById = async (req, res) => {
       workingHours,
     } = req.body;
 
-    // Step 4: Conditionally update fields
+    
     if (verificationDocuments) provider.verificationDocuments = verificationDocuments;
     if (personalImage) provider.personalImage = personalImage;
     if (location) provider.location = location;

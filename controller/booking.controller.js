@@ -194,40 +194,40 @@ export const updateBookingStatus = async (req, res) => {
 };
 
 
-export const getMonthlyCompletedBookings = async (req, res) => {
-  try {
-    const { id } = req.params;
+// export const getMonthlyCompletedBookings = async (req, res) => {
+//   try {
+//     const { id } = req.params;
 
-    const completedBookings = await Booking.aggregate([
-      {
-        $match: {
-          serviceProvider: new mongoose.Types.ObjectId(id),
-          status: "completed",
-        },
-      },
-      {
-        $group: {
-          _id: {
-            year: { $year: "$bookingDate" },
-            month: { $month: "$bookingDate" },
-          },
-          totalCompleted: { $sum: 1 },
-        },
-      },
-      {
-        $sort: {
-          "_id.year": 1,
-          "_id.month": 1,
-        },
-      },
-    ]);
+//     const completedBookings = await Booking.aggregate([
+//       {
+//         $match: {
+//           serviceProvider: new mongoose.Types.ObjectId(id),
+//           status: "completed",
+//         },
+//       },
+//       {
+//         $group: {
+//           _id: {
+//             year: { $year: "$bookingDate" },
+//             month: { $month: "$bookingDate" },
+//           },
+//           totalCompleted: { $sum: 1 },
+//         },
+//       },
+//       {
+//         $sort: {
+//           "_id.year": 1,
+//           "_id.month": 1,
+//         },
+//       },
+//     ]);
 
-    res.status(200).json(completedBookings);
-  } catch (error) {
-    console.error("Error fetching monthly completed bookings:", error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-};
+//     res.status(200).json(completedBookings);
+//   } catch (error) {
+//     console.error("Error fetching monthly completed bookings:", error);
+//     res.status(500).json({ error: "Internal server error" });
+//   }
+// };
 
 
 export const getBookingStatusPercentage = async (req, res) => {
@@ -261,5 +261,50 @@ export const getBookingStatusPercentage = async (req, res) => {
   } catch (error) {
     console.error("Error calculating status percentage:", error);
     res.status(500).json({ error: "Failed to calculate booking status percentages" });
+  }
+};
+
+
+
+export const getMonthlyCompletedBookings = async (req, res) => {
+  try {
+    const { id } = req.params; // service provider ID
+
+    const monthlyCompleted = await Booking.aggregate([
+      {
+        $match: {
+          serviceProvider: new mongoose.Types.ObjectId(id),
+          status: "completed",
+        },
+      },
+      {
+        $group: {
+          _id: {
+            year: { $year: "$bookingDate" },
+            month: { $month: "$bookingDate" },
+          },
+          totalCompleted: { $sum: 1 },
+        },
+      },
+      {
+        $sort: {
+          "_id.year": 1,
+          "_id.month": 1,
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          year: "$_id.year",
+          month: "$_id.month",
+          totalCompleted: 1,
+        },
+      },
+    ]);
+
+    res.status(200).json(monthlyCompleted);
+  } catch (error) {
+    console.error("Error in monthly completed bookings:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };

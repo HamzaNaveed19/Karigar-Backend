@@ -35,3 +35,4 @@ router.get("/notifications/:id", getProviderNotifications);
 router.get("/reviews/:id", authenticateToken,  getAllReviewsByID);
 
 export default router;
+  

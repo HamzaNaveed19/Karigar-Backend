@@ -1,7 +1,7 @@
 import Booking from "../model/Booking.model.js";
 import { io, onlineUsers } from "../server.js";
 
-import { sendSMS } from "../middleWare/BookingHelper.js"; 
+import { sendSMS } from "../middleWare/smsAPI.js"; 
 import ServiceProvider from "../model/Provider.model.js";
 import mongoose from "mongoose";
 import { addCustomerNotification } from "./customer.controller.js";
@@ -95,7 +95,7 @@ export const getBookingByCustomerId = async (req, res) => {
     }
 
     const bookings = await Booking.find(filter)
-      .sort({ bookingDate: -1 })
+      .sort({ bookingDate: 1 })
       .populate("serviceProvider", "name profession phone personalImage rating")
       .populate("reviews", "rating comment");
 

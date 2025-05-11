@@ -7,13 +7,13 @@ import {
   addProviderDetails,
   addMoreServices,
   deleteService,
-  getProviderNotifications
+  getProviderNotifications,
+  updateProviderServiceById
 } from "../controller/provider.controller.js";
 import { authenticateToken } from "../middleWare/Authentication.js";
 import { getAllReviewsByID } from "../controller/review.controller.js";
 
 const router = express.Router();
-
 
 
 router.post("/:id", addProviderDetails);
@@ -34,5 +34,8 @@ router.get("/notifications/:id", getProviderNotifications);
 
 router.get("/reviews/:id", authenticateToken,  getAllReviewsByID);
 
+router.put("/updateService/:id", updateProviderServiceById);
+
+
+
 export default router;
-  

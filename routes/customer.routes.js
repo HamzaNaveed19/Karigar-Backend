@@ -13,7 +13,6 @@ import { authenticateToken } from "../middleWare/Authentication.js";
 
 const router = express.Router();
 
-
 router.get("/:id", authenticateToken, getCustomerByID);
 
 router.get("/providers/:id", getFilteredProvidersBasedOnCustomerLocation);

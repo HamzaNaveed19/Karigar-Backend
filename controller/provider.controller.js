@@ -41,7 +41,7 @@ export const getProviderById = async (req, res) => {
     const { id } = req.params;
     
     const providerDetails = await ServiceProvider.findById(id)
-      .select('-verificationDocuments -password -roles -roleType -notifications -updatedAt -__v')
+      .select('-password -roles -roleType -notifications -updatedAt -__v')
       .populate({
         path: 'reviews',
         select: 'rating comment customer createdAt',
@@ -83,7 +83,7 @@ export const updateProviderById = async (req, res) => {
       location,
       profession,
       about,
-      services,
+      // services,
       skills,
       experience,
       languages,
@@ -97,7 +97,6 @@ export const updateProviderById = async (req, res) => {
     if (location) provider.location = location;
     if (profession) provider.profession = profession;
     if (about) provider.about = about;
-    if (services) provider.services = services;
     if (skills) provider.skills = skills;
     if (experience) provider.experience = experience;
     if (languages) provider.languages = languages;
@@ -261,6 +260,31 @@ export const deleteService = async (req, res) => {
   }
 };
 
+export const updateProviderServiceById = async (req, res) => {
+  const { id } = req.params;
+  const { serviceId, name, price, duration } = req.body;
+
+  try {
+    const updatedProvider = await ServiceProvider.findOneAndUpdate(
+      { _id: id, "services._id": serviceId },
+      { $set: { "services.$.name": name, "services.$.price": price, "services.$.duration": duration } },
+      { new: true }
+    );
+
+    if (!updatedProvider) {
+      return res.status(404).json({ error: "Service provider or service not found" });
+    }
+
+    res.status(200).json({
+      message: "Service updated successfully",
+      services: updatedProvider.services,
+    });
+  } catch (error) {
+    console.error("Error updating service:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
 
 export const getProviderNotifications = async (req, res) => {
   const { id } = req.params;
@@ -294,3 +318,6 @@ export const addProviderNotification = async (providerId, description, type) => 
       }
     });
 };
+
+
+

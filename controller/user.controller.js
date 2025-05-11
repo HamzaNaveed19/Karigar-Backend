@@ -33,10 +33,10 @@ export const registerUser = async (req, res) => {
       },
     });
 
-    await sendSMS({
-      num: phone,
-      msg: `Your OTP code for Karigar Account is : ${otpCode}`,
-    });
+    // await sendSMS({
+    //   num: phone,
+    //   msg: `Your OTP code for Karigar Account is : ${otpCode}`,
+    // });
 
     console.log("OTP sent to phone:", phone);
     console.log("OTP code:", otpCode);

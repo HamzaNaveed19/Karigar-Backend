@@ -82,20 +82,30 @@ export const getAllBookings = async (req, res) => {
   }
 };
 
+
 export const getBookingByCustomerId = async (req, res) => {
   try {
     const { id } = req.params;
+    const { status } = req.query;
 
-    const bookings = await Booking.find({ customer: id })
-      .populate("serviceProvider", "name profession phone personalImage rating") // populate specific fields
-      .populate("reviews", "rating comment"); // optional: populate reviews if you want full review details too
+    const filter = { customer: id };
+
+    if (status) {
+      filter.status = Array.isArray(status) ? { $in: status } : status;
+    }
+
+    const bookings = await Booking.find(filter)
+      .sort({ bookingDate: -1 })
+      .populate("serviceProvider", "name profession phone personalImage rating")
+      .populate("reviews", "rating comment");
 
     res.status(200).json(bookings);
   } catch (error) {
     console.error("Error fetching bookings:", error);
-    res.status(500).json({ error: "Failed to fetch bookings" });
+    res.status(500).json({ error: "Failed to fetch bookings"});
   }
 };
+
 
 export const getBookingByProviderId = async (req, res) => {
   try {

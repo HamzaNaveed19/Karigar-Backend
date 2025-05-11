@@ -1,16 +1,15 @@
 import ServiceProvider from "../model/Provider.model.js";
 import User from "../model/User.model.js";
 
-
 export const getAllProviders = async (req, res) => {
   try {
     const providerDetails = await ServiceProvider.aggregate([
       {
         $addFields: {
           serviceStartingFrom: {
-            $min: "$services.price"
-          }
-        }
+            $min: "$services.price",
+          },
+        },
       },
       {
         $project: {
@@ -24,8 +23,8 @@ export const getAllProviders = async (req, res) => {
           completedJobs: 1,
           skillCount: 1,
           serviceStartingFrom: 1,
-        }
-      }
+        },
+      },
     ]);
 
     res.status(200).json(providerDetails);
@@ -35,20 +34,19 @@ export const getAllProviders = async (req, res) => {
   }
 };
 
-
 export const getProviderById = async (req, res) => {
   try {
     const { id } = req.params;
-    
+
     const providerDetails = await ServiceProvider.findById(id)
-      .select('-password -roles -roleType -notifications -updatedAt -__v')
+      .select("-password -roles -roleType -notifications -updatedAt -__v")
       .populate({
-        path: 'reviews',
-        select: 'rating comment customer createdAt',
+        path: "reviews",
+        select: "rating comment customer createdAt",
         populate: {
-          path: 'customer',
-          select: 'name profileImage -roleType',
-        }
+          path: "customer",
+          select: "name profileImage -roleType",
+        },
       });
 
     if (!providerDetails) {
@@ -61,7 +59,6 @@ export const getProviderById = async (req, res) => {
     res.status(500).send("Error fetching record");
   }
 };
-
 
 export const updateProviderById = async (req, res) => {
   const { id } = req.params;
@@ -91,8 +88,8 @@ export const updateProviderById = async (req, res) => {
       workingHours,
     } = req.body;
 
-    
-    if (verificationDocuments) provider.verificationDocuments = verificationDocuments;
+    if (verificationDocuments)
+      provider.verificationDocuments = verificationDocuments;
     if (personalImage) provider.personalImage = personalImage;
     if (location) provider.location = location;
     if (profession) provider.profession = profession;
@@ -115,7 +112,6 @@ export const updateProviderById = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
-
 
 export const deleteProviderById = async (req, res) => {
   try {
@@ -141,7 +137,9 @@ export const addProviderDetails = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    let provider = await ServiceProvider.findById(id) || ServiceProvider.hydrate(user.toObject());
+    let provider =
+      (await ServiceProvider.findById(id)) ||
+      ServiceProvider.hydrate(user.toObject());
 
     // Extract provider-specific fields from body
     const {
@@ -190,24 +188,26 @@ export const addProviderDetails = async (req, res) => {
   }
 };
 
-
-
 export const addMoreServices = async (req, res) => {
   try {
     const { id } = req.params;
     const { services } = req.body;
 
     if (!Array.isArray(services) || services.length === 0) {
-      return res.status(400).json({ error: "Services must be a non-empty array" });
+      return res
+        .status(400)
+        .json({ error: "Services must be a non-empty array" });
     }
 
     // Validate each service object
-    const isValid = services.every(service =>
-      service.name && service.price && service.duration
+    const isValid = services.every(
+      (service) => service.name && service.price && service.duration
     );
 
     if (!isValid) {
-      return res.status(400).json({ error: "Each service must have name, price, and duration" });
+      return res
+        .status(400)
+        .json({ error: "Each service must have name, price, and duration" });
     }
 
     const updatedProvider = await ServiceProvider.findByIdAndUpdate(
@@ -229,7 +229,6 @@ export const addMoreServices = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
-
 
 export const deleteService = async (req, res) => {
   try {
@@ -267,12 +266,20 @@ export const updateProviderServiceById = async (req, res) => {
   try {
     const updatedProvider = await ServiceProvider.findOneAndUpdate(
       { _id: id, "services._id": serviceId },
-      { $set: { "services.$.name": name, "services.$.price": price, "services.$.duration": duration } },
+      {
+        $set: {
+          "services.$.name": name,
+          "services.$.price": price,
+          "services.$.duration": duration,
+        },
+      },
       { new: true }
     );
 
     if (!updatedProvider) {
-      return res.status(404).json({ error: "Service provider or service not found" });
+      return res
+        .status(404)
+        .json({ error: "Service provider or service not found" });
     }
 
     res.status(200).json({
@@ -285,39 +292,34 @@ export const updateProviderServiceById = async (req, res) => {
   }
 };
 
-
 export const getProviderNotifications = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const provider = await ServiceProvider.findById(id).select('notifications');
+    const provider = await ServiceProvider.findById(id).select("notifications");
 
     if (!provider) {
-      return res.status(404).json({ error: 'Provider not found' });
+      return res.status(404).json({ error: "Provider not found" });
     }
 
     res.status(200).json({ notifications: provider.notifications });
   } catch (error) {
-    console.error('Error fetching notifications:', error);
-    res.status(500).json({ error: 'Failed to fetch notifications' });
+    console.error("Error fetching notifications:", error);
+    res.status(500).json({ error: "Failed to fetch notifications" });
   }
 };
 
-
-export const addProviderNotification = async (providerId, description, type) => {
-  await ServiceProvider.findByIdAndUpdate(
-    providerId,
-    {
-      $push: 
-      {
-        notifications: 
-        {
-          description,
-          type
-        }
-      }
-    });
+export const addProviderNotification = async (
+  providerId,
+  description,
+  type
+) => {
+  await ServiceProvider.findByIdAndUpdate(providerId, {
+    $push: {
+      notifications: {
+        description,
+        type,
+      },
+    },
+  });
 };
-
-
-

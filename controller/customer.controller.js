@@ -175,3 +175,26 @@ export const addCustomerNotification = async (customerId, description, type) => 
     }
   });
 };
+
+
+export const markAllNotificationsAsRead = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const customer = await Customer.findById(id);
+    if (!customer) {
+      return res.status(404).json({ error: 'Customer not found' });
+    }
+
+    customer.notifications.forEach(notification => {
+      notification.read = true;
+    });
+
+    await customer.save();
+
+    res.status(200).json({ message: 'All notifications marked as read' });
+  } catch (error) {
+    console.error('Error marking notifications as read:', error);
+    res.status(500).json({ error: 'Failed to mark notifications as read' });
+  }
+};

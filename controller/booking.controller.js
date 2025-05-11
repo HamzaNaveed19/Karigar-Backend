@@ -73,7 +73,7 @@ export const getAllBookings = async (req, res) => {
     const bookings = await Booking.find()
       .populate("customer", "name email phone") // populate specific fields
       .populate("serviceProvider", "name profession phone personalImage rating") // populate specific fields
-      .populate("reviews", "rating comment"); // optional: populate reviews if you want full review details too
+      .populate("reviews", "rating comment createdAt"); // optional: populate reviews if you want full review details too
 
     res.status(200).json(bookings);
   } catch (error) {

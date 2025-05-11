@@ -6,6 +6,7 @@ import {
   addCustomerDetails,
   getCustomerNotifications,
   updateCustomerById,
+  markAllNotificationsAsRead,
 } from "../controller/customer.controller.js";
 import { addReview } from "../controller/review.controller.js";
 import { authenticateToken } from "../middleWare/Authentication.js";
@@ -26,6 +27,8 @@ router.post("/:id", authenticateToken, addCustomerDetails);
 router.put("/:id", authenticateToken, updateCustomerById);
 
 router.delete("/:id", deleteCustomerById);
+
+router.put("/updateNotification/:id", markAllNotificationsAsRead);
 
 
 export default router;

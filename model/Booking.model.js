@@ -24,7 +24,7 @@ const BookingSchema = new mongoose.Schema(
         default: "pending",
     },
 
-    reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: "Review" }], // Customer's reviews
+    reviews: { type: mongoose.Schema.Types.ObjectId, ref: "Review" }, // Customer's reviews
   },
   { timestamps: true }
 );

@@ -63,7 +63,7 @@ export const verifyOTP = async (req, res) => {
 
       return res
         .status(200)
-        .json({ message: "OTP verified", userId: user._id });
+        .json({ message: "OTP verified"});
     } else {
       return res.status(400).json({ message: "Invalid or expired OTP" });
     }
@@ -100,15 +100,23 @@ export const getUserById = async (req, res) => {
 };
 
 export const loginUser = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, role } = req.body;
 
   try {
     const user = await User.findOne({ email });
     if (!user) return res.status(400).json({ message: "Invalid credentials" });
 
+
+    if (role && !user.roles.includes(role)) {
+      return res
+        .status(403)
+        .json({ message: "User does not have the required role" });
+    }
+
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid)
       return res.status(400).json({ message: "Invalid credentials" });
+
 
     const token = jwt.sign(
       { userId: user._id, roles: user.roles },

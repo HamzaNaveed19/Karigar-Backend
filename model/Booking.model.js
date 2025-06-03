@@ -19,12 +19,12 @@ const BookingSchema = new mongoose.Schema(
     bookingTime: { type: String, required: true },
 
     status: {
-        type: String,
-        enum: ["pending", "confirmed", "completed", "cancelled"],
-        default: "pending",
+      type: String,
+      enum: ["pending", "confirmed", "completed", "cancelled"],
+      default: "pending",
     },
 
-    reviews: { type: mongoose.Schema.Types.ObjectId, ref: "Review" }, // Customer's reviews
+    reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: "Review" }], // Customer's reviews
   },
   { timestamps: true }
 );

@@ -67,12 +67,13 @@ export const getFilteredProvidersBasedOnCustomerLocation = async (req, res) => {
   }
 };
 
-
 export const getCustomerByID = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const customer = await Customer.findById(id).select('-password -roles -roleType -__v -updatedAt');
+    const customer = await Customer.findById(id).select(
+      "-password -roles -roleType -__v -updatedAt"
+    );
     if (!customer) {
       return res.status(404).json({ message: "Customer not found" });
     }
@@ -101,7 +102,6 @@ export const updateCustomerById = async (req, res) => {
   }
 };
 
-
 export const getAllCustomers = async (req, res) => {
   try {
     const customers = await Customer.find({ roleType: "Customer" });
@@ -112,10 +112,10 @@ export const getAllCustomers = async (req, res) => {
   }
 };
 
-
 export const addCustomerDetails = async (req, res) => {
   const { id } = req.params;
 
+  console.log(req.body);
   try {
     const user = await User.findById(id);
 
@@ -123,7 +123,8 @@ export const addCustomerDetails = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    const customer = await Customer.findById(id) || Customer.hydrate(user.toObject());
+    const customer =
+      (await Customer.findById(id)) || Customer.hydrate(user.toObject());
 
     const { latitude, longitude, address, profileImage } = req.body;
     customer.location = { latitude, longitude, address };
@@ -132,7 +133,6 @@ export const addCustomerDetails = async (req, res) => {
     if (!customer.roles.includes("Customer")) {
       customer.roles.push("Customer");
     }
-
 
     const savedCustomer = await customer.save();
 
@@ -146,36 +146,37 @@ export const addCustomerDetails = async (req, res) => {
   }
 };
 
-
 export const getCustomerNotifications = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const customer = await Customer.findById(id).select('notifications');
+    const customer = await Customer.findById(id).select("notifications");
 
     if (!customer) {
-      return res.status(404).json({ error: 'Customer not found' });
+      return res.status(404).json({ error: "Customer not found" });
     }
 
     res.status(200).json({ notifications: customer.notifications });
   } catch (error) {
-    console.error('Error fetching notifications:', error);
-    res.status(500).json({ error: 'Failed to fetch notifications' });
+    console.error("Error fetching notifications:", error);
+    res.status(500).json({ error: "Failed to fetch notifications" });
   }
 };
 
-
-export const addCustomerNotification = async (customerId, description, type) => {
+export const addCustomerNotification = async (
+  customerId,
+  description,
+  type
+) => {
   await Customer.findByIdAndUpdate(customerId, {
     $push: {
       notifications: {
         description,
-        type
-      }
-    }
+        type,
+      },
+    },
   });
 };
-
 
 export const markAllNotificationsAsRead = async (req, res) => {
   const { id } = req.params;
@@ -183,18 +184,18 @@ export const markAllNotificationsAsRead = async (req, res) => {
   try {
     const customer = await Customer.findById(id);
     if (!customer) {
-      return res.status(404).json({ error: 'Customer not found' });
+      return res.status(404).json({ error: "Customer not found" });
     }
 
-    customer.notifications.forEach(notification => {
+    customer.notifications.forEach((notification) => {
       notification.read = true;
     });
 
     await customer.save();
 
-    res.status(200).json({ message: 'All notifications marked as read' });
+    res.status(200).json({ message: "All notifications marked as read" });
   } catch (error) {
-    console.error('Error marking notifications as read:', error);
-    res.status(500).json({ error: 'Failed to mark notifications as read' });
+    console.error("Error marking notifications as read:", error);
+    res.status(500).json({ error: "Failed to mark notifications as read" });
   }
 };

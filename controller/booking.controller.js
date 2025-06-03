@@ -1,12 +1,11 @@
 import Booking from "../model/Booking.model.js";
 import { io, onlineUsers } from "../server.js";
 
-import { sendSMS } from "../middleWare/smsAPI.js"; 
+import { sendSMS } from "../middleWare/smsAPI.js";
 import ServiceProvider from "../model/Provider.model.js";
 import mongoose from "mongoose";
 import { addCustomerNotification } from "./customer.controller.js";
 // import { addProviderNotification } from "./provider.controller.js";
-
 
 export const addBooking = async (req, res) => {
   try {
@@ -36,6 +35,7 @@ export const addBooking = async (req, res) => {
       bookingDate,
       bookingTime,
       status: "pending", // Default status
+      reviews: [],
     });
 
     const savedBooking = await newBooking.save();
@@ -50,18 +50,20 @@ export const addBooking = async (req, res) => {
     const socketId = onlineUsers.get(providerId);
 
     if (socketId) {
-      io.to(socketId).emit("newBooking", savedBooking );
+      io.to(socketId).emit("newBooking", savedBooking);
     }
 
     const populatedBooking = await Booking.findById(savedBooking._id)
-      .select('-__v -updatedAt -customer -reviews')
-      .populate("serviceProvider", "name profession personalImage rating -roleType");
+      .select("-__v -updatedAt -customer -reviews")
+      .populate(
+        "serviceProvider",
+        "name profession personalImage rating -roleType"
+      );
 
     res.status(201).json({
       message: "Booking created successfully",
       booking: populatedBooking,
     });
-
   } catch (error) {
     console.error("Error adding booking:", error);
     res.status(500).json({ error: "Failed to create booking" });
@@ -82,7 +84,6 @@ export const getAllBookings = async (req, res) => {
   }
 };
 
-
 export const getBookingByCustomerId = async (req, res) => {
   try {
     const { id } = req.params;
@@ -97,15 +98,14 @@ export const getBookingByCustomerId = async (req, res) => {
     const bookings = await Booking.find(filter)
       .sort({ bookingDate: 1 })
       .populate("serviceProvider", "name profession phone personalImage rating")
-      .populate("reviews", "rating comment");
+      .populate("reviews", "rating comment createdAt");
 
     res.status(200).json(bookings);
   } catch (error) {
     console.error("Error fetching bookings:", error);
-    res.status(500).json({ error: "Failed to fetch bookings"});
+    res.status(500).json({ error: "Failed to fetch bookings" });
   }
 };
-
 
 export const getBookingByProviderId = async (req, res) => {
   try {
@@ -121,7 +121,6 @@ export const getBookingByProviderId = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch bookings" });
   }
 };
-
 
 export const updateBookingStatus = async (req, res) => {
   try {
@@ -141,20 +140,21 @@ export const updateBookingStatus = async (req, res) => {
     const customerId = updatedBooking.customer._id.toString();
     const socketId = onlineUsers.get(customerId);
 
-
     // SMS notification
     const phone = updatedBooking.customer.phone;
     const message =
-      status === "confirmed" ? `Dear ${updatedBooking.customer.name}, your booking '${updatedBooking.bookingTitle}' has been confirmed.`
-      : status === "cancelled" ? `Dear ${updatedBooking.customer.name}, your booking '${updatedBooking.bookingTitle}' has been cancelled.`
-      : status === "completed" ? `Dear ${updatedBooking.customer.name}, your booking '${updatedBooking.bookingTitle}' has been completed. Thank you for using KARIGAR!`
-      : null;
+      status === "confirmed"
+        ? `Dear ${updatedBooking.customer.name}, your booking '${updatedBooking.bookingTitle}' has been confirmed.`
+        : status === "cancelled"
+        ? `Dear ${updatedBooking.customer.name}, your booking '${updatedBooking.bookingTitle}' has been cancelled.`
+        : status === "completed"
+        ? `Dear ${updatedBooking.customer.name}, your booking '${updatedBooking.bookingTitle}' has been completed. Thank you for using KARIGAR!`
+        : null;
 
     if (status === "completed") {
-       await ServiceProvider.findByIdAndUpdate(
-        updatedBooking.serviceProvider,
-        { $inc: { completedJobs: 1 } }
-      );
+      await ServiceProvider.findByIdAndUpdate(updatedBooking.serviceProvider, {
+        $inc: { completedJobs: 1 },
+      });
 
       await addCustomerNotification(
         updatedBooking.customer._id,
@@ -163,7 +163,7 @@ export const updateBookingStatus = async (req, res) => {
       );
     }
 
-    if(status === "cancelled") {
+    if (status === "cancelled") {
       await addCustomerNotification(
         updatedBooking.customer._id,
         `Your booking '${updatedBooking.bookingTitle}' has been cancelled.`,
@@ -171,14 +171,13 @@ export const updateBookingStatus = async (req, res) => {
       );
     }
 
-    if(status === "confirmed") {
+    if (status === "confirmed") {
       await addCustomerNotification(
         updatedBooking.customer._id,
         `Your booking '${updatedBooking.bookingTitle}' has been confirmed.`,
         "confirmed"
       );
     }
-
 
     // if (message) {
     //   try {
@@ -188,13 +187,10 @@ export const updateBookingStatus = async (req, res) => {
     //   }
     // }
 
-
     // Real-time update
     if (socketId) {
       io.to(socketId).emit("bookingStatusUpdated", updatedBooking);
     }
-
-
 
     res.status(200).json(updatedBooking);
   } catch (error) {
@@ -202,7 +198,6 @@ export const updateBookingStatus = async (req, res) => {
     res.status(500).json({ error: "Failed to update booking status" });
   }
 };
-
 
 // export const getMonthlyCompletedBookings = async (req, res) => {
 //   try {
@@ -239,7 +234,6 @@ export const updateBookingStatus = async (req, res) => {
 //   }
 // };
 
-
 export const getBookingStatusPercentage = async (req, res) => {
   try {
     const { id } = req.params;
@@ -262,19 +256,19 @@ export const getBookingStatusPercentage = async (req, res) => {
     });
 
     const percentage = {
-      Completed: ((completed / total) * 100),
-      Cancelled: ((cancelled / total) * 100),
-      Upcoming: ((upcoming / total) * 100),
+      Completed: (completed / total) * 100,
+      Cancelled: (cancelled / total) * 100,
+      Upcoming: (upcoming / total) * 100,
     };
 
     res.status(200).json(percentage);
   } catch (error) {
     console.error("Error calculating status percentage:", error);
-    res.status(500).json({ error: "Failed to calculate booking status percentages" });
+    res
+      .status(500)
+      .json({ error: "Failed to calculate booking status percentages" });
   }
 };
-
-
 
 export const getMonthlyCompletedBookings = async (req, res) => {
   try {

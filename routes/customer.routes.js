@@ -21,13 +21,12 @@ router.get("/notifications/:id", authenticateToken, getCustomerNotifications);
 
 router.post("/addReview", authenticateToken, addReview);
 
-router.post("/:id", authenticateToken, addCustomerDetails);
+router.post("/:id", addCustomerDetails);
 
 router.put("/:id", authenticateToken, updateCustomerById);
 
 router.delete("/:id", deleteCustomerById);
 
 router.put("/updateNotification/:id", markAllNotificationsAsRead);
-
 
 export default router;

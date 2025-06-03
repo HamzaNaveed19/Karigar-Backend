@@ -4,13 +4,12 @@ import http from "http";
 import { Server } from "socket.io";
 import cors from "cors";
 
-import userRoutes from "./routes/user.routes.js"; 
-import providerRoutes from './routes/provider.routes.js'; 
-import customerRoutes from './routes/customer.routes.js'; 
-import bookingRoutes from './routes/booking.routes.js';
-import categoryRoutes from './routes/category.routes.js';
+import userRoutes from "./routes/user.routes.js";
+import providerRoutes from "./routes/provider.routes.js";
+import customerRoutes from "./routes/customer.routes.js";
+import bookingRoutes from "./routes/booking.routes.js";
+import categoryRoutes from "./routes/category.routes.js";
 import connectDB from "./db/connection.js";
-
 
 dotenv.config();
 
@@ -51,7 +50,6 @@ io.on("connection", (socket) => {
   });
 });
 
-
 app.use("/user", userRoutes);
 app.use("/provider", providerRoutes);
 app.use("/customer", customerRoutes);
@@ -61,6 +59,5 @@ app.use("/category", categoryRoutes);
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-
 
 export { io, onlineUsers };

@@ -3,7 +3,21 @@ import User from "../model/User.model.js";
 
 export const getAllProviders = async (req, res) => {
   try {
-    const providerDetails = await ServiceProvider.aggregate([
+    const { city } = req.query;
+
+    const matchStage = city
+      ? {
+          $match: {
+            "location.address": {
+              $regex: city,
+              $options: "i", // case-insensitive
+            },
+          },
+        }
+      : {};
+
+    const pipeline = [
+      ...(city ? [matchStage] : []),
       {
         $addFields: {
           serviceStartingFrom: {
@@ -25,7 +39,9 @@ export const getAllProviders = async (req, res) => {
           serviceStartingFrom: 1,
         },
       },
-    ]);
+    ];
+
+    const providerDetails = await ServiceProvider.aggregate(pipeline);
 
     res.status(200).json(providerDetails);
   } catch (err) {

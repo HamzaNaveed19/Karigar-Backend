@@ -21,6 +21,8 @@ export const registerUser = async (req, res) => {
     const otpCode = Math.floor(1000 + Math.random() * 9000).toString();
     const otpExpires = new Date(Date.now() + 5 * 60 * 1000);
 
+    console.log(otpCode);
+
     const newUser = await User.create({
       name,
       email,
@@ -32,6 +34,8 @@ export const registerUser = async (req, res) => {
         expiresAt: otpExpires,
       },
     });
+
+    console.log(newUser);
 
     // await sendSMS({
     //   num: phone,
@@ -52,18 +56,18 @@ export const registerUser = async (req, res) => {
 
 export const verifyOTP = async (req, res) => {
   const { userId, otp } = req.body;
+  console.log(userId);
 
   try {
     const user = await User.findById(userId);
+
     if (!user) return res.status(404).json({ message: "User not found" });
 
     if (user.otp.code === otp && new Date() < new Date(user.otp.expiresAt)) {
       user.otp = undefined;
       await user.save();
 
-      return res
-        .status(200)
-        .json({ message: "OTP verified"});
+      return res.status(200).json({ message: "OTP verified" });
     } else {
       return res.status(400).json({ message: "Invalid or expired OTP" });
     }
@@ -71,8 +75,6 @@ export const verifyOTP = async (req, res) => {
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };
-
-
 
 export const getAllUsers = async (req, res) => {
   try {
@@ -106,7 +108,6 @@ export const loginUser = async (req, res) => {
     const user = await User.findOne({ email });
     if (!user) return res.status(400).json({ message: "Invalid credentials" });
 
-
     if (role && !user.roles.includes(role)) {
       return res
         .status(403)
@@ -116,7 +117,6 @@ export const loginUser = async (req, res) => {
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid)
       return res.status(400).json({ message: "Invalid credentials" });
-
 
     const token = jwt.sign(
       { userId: user._id, roles: user.roles },
